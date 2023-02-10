@@ -1,1 +1,0 @@
-Add notebooks for the player to keep track of their observations. For larger levels.
