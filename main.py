@@ -1,5 +1,3 @@
-# Basic arcade shooter
-
 # Imports
 import arcade
 import threading
@@ -29,7 +27,7 @@ time_left = ""
         
 
 class SubwayCar(arcade.Window):
-    """Do thing
+    """An instance of an Arcade Window that creates and runs the game.
     """
 
     def __init__(self, width, height, title):
@@ -58,10 +56,10 @@ class SubwayCar(arcade.Window):
         self.add_car() #830 * 278
         self.background_music = arcade.Sound("sounds/soft-piano.wav", True)
         self.background_music.play(loop=True)
-
+        # enable gui manager
         self.manager = gui.UIManager()
         self.manager.enable()
-
+        # define the text area where information will be displayed
         self.text_area = UITextArea(x=20,
                                y=417,
                                width=900,
@@ -76,6 +74,7 @@ class SubwayCar(arcade.Window):
 
         self.v_box = gui.UIBoxLayout(x=900, y=420, vertical=True)
 
+        # add all the buttons at the top left
         self.clues_button = gui.UIFlatButton(text="Clues", width=200, height=30)
         self.v_box.add(self.clues_button.with_space_around(bottom=10))
 
@@ -93,6 +92,7 @@ class SubwayCar(arcade.Window):
         self.spy_on_button.on_click = self.get_eavesdrop
         self.event_button.on_click = self.get_event
 
+        # an anchor widget for the buttons
         self.manager.add(
             gui.UIAnchorWidget(
                 anchor_x="left",
@@ -103,10 +103,11 @@ class SubwayCar(arcade.Window):
                 child=self.v_box)
         )
 
+        # initialize all the selectors
         self.selector1 = Selector(SELECTOR_IMG, SCALING)
 
         self.currently_selected = self.selector1
-
+        # if the selector is visible, put it above its associated passenger. otherwise, it is off screen
         self.selector1._visible == True
         self.selector1.center_y = PASS_Y_POS + 70
         self.selector1.center_x = PASS_X_POS_LIST[0]
@@ -160,6 +161,7 @@ class SubwayCar(arcade.Window):
         
         self.game_end_timer = 0.0
         
+        # start the timer
         self.timer = threading.Thread(target=self.countdown,args=(60,))
         self.timer.start()
 
@@ -177,7 +179,7 @@ class SubwayCar(arcade.Window):
         self.all_sprites.append(passenger1)
 
     def add_passenger_2(self):
-        """Adds new passenger
+        """Adds new passenger.
         """
         passenger2 = Passenger2(PASSENGER_IMG, SCALING)
 
@@ -188,7 +190,7 @@ class SubwayCar(arcade.Window):
         self.all_sprites.append(passenger2)
 
     def add_passenger_3(self):
-        """Adds new passenger
+        """Adds new passenger.
         """
         passenger3 = Passenger3(PASSENGER_IMG, SCALING)
         passenger3.center_x = PASS_X_POS_LIST[2]
@@ -198,7 +200,7 @@ class SubwayCar(arcade.Window):
         self.all_sprites.append(passenger3)
 
     def add_passenger_4(self):
-        """Adds new passenger
+        """Adds new passenger.
         """
         passenger4 = Passenger4(PASSENGER_IMG, SCALING)
         passenger4.center_x = PASS_X_POS_LIST[3]
@@ -208,7 +210,7 @@ class SubwayCar(arcade.Window):
         self.all_sprites.append(passenger4)
 
     def add_car(self):
-        """add car"""
+        """Adds the subway car image."""
 
         car = arcade.Sprite("images/subway_car.jpg", SCALING)
         
@@ -231,6 +233,7 @@ class SubwayCar(arcade.Window):
             # Quit immediately
             arcade.close_window()
 
+        # move left
         if symbol == arcade.key.LEFT:
             
             current_index = self.selectors_list.index(self.currently_selected)
@@ -263,7 +266,7 @@ class SubwayCar(arcade.Window):
                 self.currently_selected.center_y = PASS_Y_POS + 70
                 self.currently_selected.center_x = PASS_X_POS_LIST[new_index]
 
-
+        # move selector right
         if symbol == arcade.key.RIGHT:
             current_index = self.selectors_list.index(self.currently_selected)
             if (current_index + 1) <= 3:
@@ -288,7 +291,7 @@ class SubwayCar(arcade.Window):
                 self.currently_selected._visible = True
                 self.currently_selected.center_y = PASS_Y_POS + 70
                 self.currently_selected.center_x = PASS_X_POS_LIST[new_index]
-
+        # enter to select passenger
         if symbol == arcade.key.ENTER:
 
             for p in self.passengers_list:
@@ -297,7 +300,7 @@ class SubwayCar(arcade.Window):
                     self.info = p.basic_info
                     self.text_area.text = self.info
 
-    def get_clues(self, event): # gotta pass in another unused param for some reason
+    def get_clues(self, event): # gotta pass in another unused param for some unknown reason
         
         self.text_area.text = CLUES
 
@@ -327,6 +330,7 @@ class SubwayCar(arcade.Window):
             if p.center_x == self.currently_selected.center_x:
                 self.text_area.text = p.eavesdrop
 
+    # success and game over messages
     def fail_wail(self, event):
 
         self.text_area.text = "Incorrect. Try again next time."
@@ -336,14 +340,14 @@ class SubwayCar(arcade.Window):
 
         self.text_area.text = "CORRECT! CONGRATS YOU WON!"
         self.is_game_over = True
-
+    # do the countdown
     def countdown(self, t):
         global time_left
         while t >= 0:
             time_left = t
             time.sleep(1)
             t -= 1
-
+    # end the game if needed
     def on_update(self, delta_time: float):
         
         if self.is_game_over == True:
